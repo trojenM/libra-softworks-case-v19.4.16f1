@@ -3,12 +3,16 @@ using UnityEngine;
 
 namespace Game.Mechanics
 {
-    public class FitGridToScreen : MonoBehaviour
+    public class CameraResize : MonoBehaviour
     {
+        [Header("References")]
         [SerializeField] Transform target;
-        [SerializeField] public Vector3 offset;
         [SerializeField] public Camera cameraComponent;
         [SerializeField] private GridSystem grid;
+        
+        [Header("Properties")]
+        [SerializeField] public Vector3 offset;
+
     
         private void Awake()
         {
@@ -37,18 +41,26 @@ namespace Game.Mechanics
 
             transform.position = targetPosition;
         }
+        
+       private void FitToScreen()
+       {
+           float screenRatio = (float)Screen.width / Screen.height;
+           float gridRatio = (float)grid.Size / grid.Size;
+           float cameraSize;
+       
+           if (screenRatio >= gridRatio)
+           {
+               cameraSize = grid.Size / 2f;
+           }
+           else
+           {
+               float differenceInSize = gridRatio / screenRatio;
+               cameraSize = grid.Size / 2f * differenceInSize;
+           }
+       
+           cameraComponent.orthographicSize = cameraSize * offset.z;
+       }
 
-        private void FitToScreen()
-        {
-            float targetAspect = cameraComponent.aspect * offset.z;
-
-            float currentAspect = (float)Screen.width / Screen.height;
-            float scaleFactor = currentAspect / targetAspect;
-
-            float defaultSize = grid.Size;
-            float newSize = defaultSize * scaleFactor;
-
-            cameraComponent.orthographicSize = newSize;
-        }
+        
     }    
 }
